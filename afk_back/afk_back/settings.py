@@ -172,16 +172,17 @@ SIMPLE_JWT = {
     'JTI_CLAIM': 'jti',
 }
 
-# CORS settings
+CORS_ALLOW_ALL_ORIGINS = True  # Временно для запуска
+# Или правильные настройки:
 CORS_ALLOWED_ORIGINS = [
-    "localhost",
-    "176.109.105.158",
-    "localhost:5173",
-    "127.0.0.1",
-    'backend',
-    'frontend', 
-    'afkural.ru',
-    'www.afkural.ru',
+    "http://localhost:3000",
+    "http://176.109.105.158",
+    "http://localhost:5173", 
+    "http://127.0.0.1:5173",
+    "http://backend:8000",
+    "http://frontend:80",
+    "http://afkural.ru",
+    "https://afkural.ru",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
