@@ -1,0 +1,57 @@
+.scrolltop {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background: #1f6feb;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(31, 111, 235, 0.3);
+}
+
+.scrolltop.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.scrolltop:hover {
+  background: #155bb5;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(31, 111, 235, 0.4);
+}
+
+.scrolltop:active {
+  transform: translateY(0);
+}
+
+/* Адаптивные стили */
+@media (max-width: 768px) {
+  .scrolltop {
+    bottom: 16px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .scrolltop {
+    bottom: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+} 

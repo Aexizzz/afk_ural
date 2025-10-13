@@ -1,0 +1,148 @@
+.suppliers {
+  background: #f8f9fb;
+}
+
+.container {
+  width: min(1100px, 92%);
+  margin: 0 auto;
+}
+
+.suppliers-hero {
+  background: linear-gradient(135deg, #0f172a 0%, #1f2937 60%, #334155 100%);
+  padding: 64px 0 48px;
+  color: #fff;
+}
+
+.suppliers-title {
+  margin: 0 0 8px 0;
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 800;
+}
+
+.suppliers-subtitle {
+  margin: 0;
+  opacity: 0.9;
+  font-size: clamp(14px, 2vw, 18px);
+}
+
+.card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+  border: 1px solid #eef2f7;
+  margin-top: 24px;
+}
+
+.card h2 {
+  margin: 0 0 8px 0;
+  font-size: 22px;
+  color: #111827;
+}
+
+.list {
+  margin: 0;
+  padding-left: 18px;
+  color: #374151;
+}
+
+.cta.card {
+  text-align: center;
+  background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 18px;
+  border-radius: 10px;
+  background: #1f6feb;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background .2s ease, transform .2s ease;
+}
+
+.btn:hover { background: #155bb5; transform: translateY(-2px); }
+
+/* Адаптивные стили */
+@media (max-width: 768px) {
+  .suppliers-hero {
+    padding: 48px 0 36px;
+  }
+  
+  .suppliers-title {
+    font-size: clamp(24px, 6vw, 32px);
+  }
+  
+  .suppliers-subtitle {
+    font-size: clamp(14px, 3vw, 16px);
+  }
+  
+  .card {
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+  }
+  
+  .card h2 {
+    font-size: 20px;
+  }
+  
+  .list {
+    font-size: 14px;
+  }
+  
+  .btn {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .suppliers-hero {
+    padding: 40px 0 28px;
+  }
+  
+  .card {
+    padding: 18px;
+    margin-top: 16px;
+  }
+  
+  .list {
+    padding-left: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .suppliers-hero {
+    padding: 32px 0 24px;
+  }
+  
+  .suppliers-title {
+    font-size: clamp(20px, 7vw, 28px);
+  }
+  
+  .suppliers-subtitle {
+    font-size: 14px;
+  }
+  
+  .card {
+    padding: 16px;
+    border-radius: 10px;
+    margin-top: 12px;
+  }
+  
+  .card h2 {
+    font-size: 18px;
+  }
+  
+  .list {
+    font-size: 13px;
+    padding-left: 14px;
+  }
+  
+  .btn {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+} 
