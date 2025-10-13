@@ -1,7 +1,7 @@
 # Многоэтапная сборка для React приложения
 
 # Этап 1: Сборка приложения
-FROM node:18-alpine as build
+FROM node:18-alpine AS build
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
@@ -9,8 +9,8 @@ WORKDIR /app
 # Копируем package.json и package-lock.json
 COPY package*.json ./
 
-# Устанавливаем зависимости
-RUN npm ci --only=production
+# Устанавливаем все зависимости (включая dev) для сборки Vite
+RUN npm ci
 
 # Копируем исходный код
 COPY . .
