@@ -12,7 +12,7 @@ export default function Contacts() {
 
   // Базовый URL настраивается из переменных окружения Vite
   if (!axios.defaults.baseURL) {
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://176.109.105.158:8000/api'
     axios.defaults.baseURL = apiBaseUrl
   }
 

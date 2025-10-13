@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('access_token'));
 
   // Настройка axios baseURL из переменных окружения Vite
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://176.109.105.158:8000/api';
   axios.defaults.baseURL = apiBaseUrl;
 
   // Добавляем токен к запросам
