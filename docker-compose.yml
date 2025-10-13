@@ -14,7 +14,7 @@ services:
       - ./afk_back/db.sqlite3:/app/db.sqlite3
     environment:
       - DEBUG=False
-      - ALLOWED_HOSTS=localhost,127.0.0.1,afk_backend
+      - ALLOWED_HOSTS=localhost,127.0.0.1,afk_backend,176.109.105.158,afkural.ru,www.afkural.ru
     restart: unless-stopped
     networks:
       - afk_network
