@@ -6,6 +6,7 @@ services:
     build:
       context: ./afk_back
       dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
     container_name: afk_backend
     ports:
       - "8000:8000"
@@ -25,8 +26,6 @@ services:
       context: ./afk_front
       dockerfile: Dockerfile
     container_name: afk_frontend
-    ports:
-      - "80:80"
     depends_on:
       - backend
     restart: unless-stopped
@@ -38,12 +37,28 @@ services:
     image: nginx:alpine
     container_name: afk_nginx
     ports:
-      - "8080:80"
+      - "80:80"
+      - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - certbot-www:/var/www/certbot
+      - letsencrypt:/etc/letsencrypt
     depends_on:
       - backend
       - frontend
+    restart: unless-stopped
+    networks:
+      - afk_network
+
+  # Certbot для выпуска/продления сертификатов Let's Encrypt
+  certbot:
+    image: certbot/certbot:latest
+    container_name: afk_certbot
+    volumes:
+      - certbot-www:/var/www/certbot
+      - letsencrypt:/etc/letsencrypt
+    entrypoint: sh
+    command: -c "while :; do certbot renew --webroot -w /var/www/certbot --quiet || true; sleep 12h; done"
     restart: unless-stopped
     networks:
       - afk_network
@@ -55,3 +70,5 @@ networks:
 volumes:
   media_data:
   db_data:
+  certbot-www:
+  letsencrypt:
