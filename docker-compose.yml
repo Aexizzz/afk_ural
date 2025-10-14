@@ -41,6 +41,7 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
       - certbot-www:/var/www/certbot
       - letsencrypt:/etc/letsencrypt
+      - certbot_data:/etc/letsencrypt
     depends_on:
       - backend
       - frontend
@@ -68,6 +69,7 @@ services:
     volumes:
       - certbot-www:/var/www/certbot
       - letsencrypt:/etc/letsencrypt
+      - certbot_data:/etc/letsencrypt
     entrypoint: sh
     command: -c "while :; do certbot renew --webroot -w /var/www/certbot --quiet || true; sleep 12h; done"
     restart: unless-stopped
@@ -83,3 +85,4 @@ volumes:
   db_data:
   certbot-www:
   letsencrypt:
+  certbot_data:
