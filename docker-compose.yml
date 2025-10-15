@@ -16,6 +16,7 @@ services:
     environment:
       - DEBUG=False
       - ALLOWED_HOSTS=localhost,127.0.0.1,afk_backend,176.109.105.158,afkural.ru,www.afkural.ru
+      - FRONTEND_URL=http://frontend:80
     restart: unless-stopped
     networks:
       - afk_network
@@ -31,6 +32,8 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
+    environment:
+      - API_URL=http://backend:8000
     networks:
       - afk_network
 
