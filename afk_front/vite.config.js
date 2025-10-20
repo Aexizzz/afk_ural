@@ -16,13 +16,7 @@ export default defineConfig({
       }
     },
     // Минификация для лучшей производительности
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // Удаляем console.log в продакшене
-        drop_debugger: true
-      }
-    }
+    minify: 'esbuild'
   },
   // Оптимизация для разработки
   server: {
