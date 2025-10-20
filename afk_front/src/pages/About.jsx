@@ -1,10 +1,27 @@
 import './About.css'
 import Reveal from '../components/Reveal'
 import Editable from '../components/Editable'
+import { useSEO } from '../hooks/useSEO'
+import StructuredData, { BreadcrumbData } from '../components/StructuredData'
 
 export default function About() {
+  // SEO настройки для страницы "О нас"
+  useSEO({
+    title: 'Как мы работаем — ООО АФК «Урал» | Процесс производства металлоизделий',
+    description: 'Узнайте, как работает ООО АФК «Урал»: от вашей идеи до готового изделия. Профессиональная металлообработка в Екатеринбурге. Лазерная резка, гибка, сварка, окрашивание.',
+    keywords: 'как мы работаем, процесс производства, металлообработка, лазерная резка, гибка металла, сварка, окрашивание, Екатеринбург, АФК Урал',
+    canonical: 'https://afk-ural.ru/about',
+    ogImage: 'https://afk-ural.ru/src/assets/logo_afk.jpg'
+  })
+
+  const breadcrumbData = BreadcrumbData([
+    { name: 'Главная', url: 'https://afk-ural.ru/' },
+    { name: 'Как мы работаем', url: 'https://afk-ural.ru/about' }
+  ])
   return (
-    <section className="about">
+    <>
+      <StructuredData data={breadcrumbData} />
+      <section className="about">
       <Reveal as="div" className="about-hero">
         <div className="container">
           <Editable pageKey="about" blockKey="title" tag="h1" className="about-title" placeholder="О нас" />
@@ -53,5 +70,6 @@ export default function About() {
         </Reveal>
       </div>
     </section>
+    </>
   )
 } 

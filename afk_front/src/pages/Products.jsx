@@ -2,10 +2,27 @@ import './Products.css'
 import Reveal from '../components/Reveal'
 import Editable from '../components/Editable'
 import EditableGallery from '../components/EditableGallery'
+import { useSEO } from '../hooks/useSEO'
+import StructuredData, { BreadcrumbData } from '../components/StructuredData'
 
 export default function Products() {
+  // SEO настройки для страницы продуктов
+  useSEO({
+    title: 'Продукция — ООО АФК «Урал» | Аппаратные контейнеры, фермы, опоры, мачты',
+    description: 'Производство аппаратных контейнеров, ферм, опор, мачт для антенных конструкций. Качественная металлообработка в Екатеринбурге. Лазерная резка, гибка, сварка, окрашивание.',
+    keywords: 'продукция, аппаратные контейнеры, фермы, опоры, мачты, антенные конструкции, металлообработка, производство, Екатеринбург, АФК Урал',
+    canonical: 'https://afk-ural.ru/products',
+    ogImage: 'https://afk-ural.ru/src/assets/logo_afk.jpg'
+  })
+
+  const breadcrumbData = BreadcrumbData([
+    { name: 'Главная', url: 'https://afk-ural.ru/' },
+    { name: 'Продукция', url: 'https://afk-ural.ru/products' }
+  ])
   return (
-    <section className="products">
+    <>
+      <StructuredData data={breadcrumbData} />
+      <section className="products">
       <Reveal as="div" className="products-hero">
         <div className="container">
           <Editable pageKey="products" blockKey="title" tag="h1" className="products-title" placeholder="Продукция" />
@@ -34,5 +51,6 @@ export default function Products() {
         </Reveal>
       </div>
     </section>
+    </>
   )
 } 

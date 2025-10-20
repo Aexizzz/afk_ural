@@ -1,7 +1,17 @@
 import Reveal from '../components/Reveal'
 import Editable from '../components/Editable'
+import { useSEO } from '../hooks/useSEO'
+import StructuredData, { OrganizationData } from '../components/StructuredData'
 
 export default function Home() {
+  // SEO настройки для главной страницы
+  useSEO({
+    title: 'АФК УРАЛ — официальный сайт ООО АФК «Урал» | Металлообработка и окрашивание',
+    description: 'Официальный сайт ООО АФК «Урал». Производство аппаратных контейнеров, ферм, опор, мачт для антенных конструкций. Лазерная резка, гибка, сварка, порошковая и жидкая окраска металла в Екатеринбурге.',
+    keywords: 'АФК Урал, металлообработка, лазерная резка, гибка металла, сварка, порошковая окраска, жидкая окраска, Екатеринбург, аппаратные контейнеры, фермы, опоры, мачты',
+    canonical: 'https://afk-ural.ru/',
+    ogImage: 'https://afk-ural.ru/src/assets/logo_afk.jpg'
+  })
   const cards = [
     { key: 'card1', title: 'Лазерная резка', href: '/metalworking/laser-cutting' },
     { key: 'card2', title: 'Гибка листового металла', href: '/metalworking/sheet-bending' },
@@ -11,8 +21,10 @@ export default function Home() {
   ]
 
   return (
-    <section className="home">
-      <div className="container">
+    <>
+      <StructuredData data={OrganizationData} />
+      <section className="home">
+        <div className="container">
         <Reveal y={16}>
           <Editable pageKey="home" blockKey="title" tag="h1" placeholder="ООО АФК «Урал»" />
           <Editable pageKey="home" blockKey="subtitle" tag="p" placeholder="Официальный сайт. Металлообработка и окрашивание." />
@@ -29,5 +41,6 @@ export default function Home() {
         </div>
       </div>
     </section>
+    </>
   )
 }

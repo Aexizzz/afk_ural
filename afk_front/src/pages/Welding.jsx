@@ -1,10 +1,35 @@
 import './Welding.css'
 import Reveal from '../components/Reveal'
 import Editable from '../components/Editable'
+import { useSEO } from '../hooks/useSEO'
+import StructuredData, { ServiceData, BreadcrumbData } from '../components/StructuredData'
 
 export default function Welding() {
+  // SEO настройки для страницы сварочных работ
+  useSEO({
+    title: 'Сварочные работы — ООО АФК «Урал» | Профессиональная сварка металла',
+    description: 'Сварочные работы на профессиональном оборудовании. Качественная сварка металла любой сложности в Екатеринбурге. Опытные сварщики, современные технологии.',
+    keywords: 'сварочные работы, сварка металла, профессиональная сварка, металлообработка, Екатеринбург, АФК Урал, сварщики, технологии',
+    canonical: 'https://afk-ural.ru/metalworking/welding',
+    ogImage: 'https://afk-ural.ru/src/assets/logo_afk.jpg'
+  })
+
+  const serviceData = ServiceData(
+    'Сварочные работы',
+    'Профессиональные сварочные работы на современном оборудовании. Качественная сварка металла любой сложности опытными специалистами.',
+    'https://afk-ural.ru/metalworking/welding'
+  )
+
+  const breadcrumbData = BreadcrumbData([
+    { name: 'Главная', url: 'https://afk-ural.ru/' },
+    { name: 'Металлообработка', url: 'https://afk-ural.ru/metalworking' },
+    { name: 'Сварочные работы', url: 'https://afk-ural.ru/metalworking/welding' }
+  ])
   return (
-    <section className="welding">
+    <>
+      <StructuredData data={serviceData} />
+      <StructuredData data={breadcrumbData} />
+      <section className="welding">
       <Reveal as="div" className="welding-hero">
         <div className="container">
           <Editable pageKey="welding" blockKey="title" tag="h1" className="welding-title" placeholder="Сварочные работы" />
@@ -66,5 +91,6 @@ export default function Welding() {
         </Reveal>
       </div>
     </section>
+    </>
   )
 } 

@@ -1,0 +1,27 @@
+User-agent: *
+Allow: /
+
+# Запрещаем индексацию админ-панели
+Disallow: /admin/
+
+# Запрещаем индексацию служебных файлов
+Disallow: /api/
+Disallow: /_next/
+Disallow: /static/
+
+# Разрешаем индексацию основных страниц
+Allow: /
+Allow: /about
+Allow: /products
+Allow: /contacts
+Allow: /suppliers
+Allow: /metalworking/
+Allow: /painting/
+Allow: /privacy
+Allow: /requisites
+
+# Указываем местоположение sitemap
+Sitemap: https://afk-ural.ru/sitemap.xml
+
+# Дополнительные директивы для поисковых систем
+Crawl-delay: 1

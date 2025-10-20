@@ -3,10 +3,35 @@ import Reveal from '../components/Reveal';
 import '../styles/services.css';
 import './SheetMetalBending.css';
 import Editable from '../components/Editable';
+import { useSEO } from '../hooks/useSEO';
+import StructuredData, { ServiceData, BreadcrumbData } from '../components/StructuredData';
 
 const SheetMetalBending = () => {
+  // SEO настройки для страницы гибки листового металла
+  useSEO({
+    title: 'Гибка листового металла — ООО АФК «Урал» | Профессиональная гибка металла',
+    description: 'Гибка листового металла на современном оборудовании. Профессиональная обработка металла любой сложности в Екатеринбурге. Высокая точность и качество.',
+    keywords: 'гибка металла, гибка листового металла, металлообработка, гибочное оборудование, Екатеринбург, АФК Урал, точность, качество',
+    canonical: 'https://afk-ural.ru/metalworking/sheet-bending',
+    ogImage: 'https://afk-ural.ru/src/assets/logo_afk.jpg'
+  })
+
+  const serviceData = ServiceData(
+    'Гибка листового металла',
+    'Профессиональная гибка листового металла на современном оборудовании. Высокая точность и качество обработки металла любой сложности.',
+    'https://afk-ural.ru/metalworking/sheet-bending'
+  )
+
+  const breadcrumbData = BreadcrumbData([
+    { name: 'Главная', url: 'https://afk-ural.ru/' },
+    { name: 'Металлообработка', url: 'https://afk-ural.ru/metalworking' },
+    { name: 'Гибка листового металла', url: 'https://afk-ural.ru/metalworking/sheet-bending' }
+  ])
   return (
-    <div className="sheet-bending service-page">
+    <>
+      <StructuredData data={serviceData} />
+      <StructuredData data={breadcrumbData} />
+      <div className="sheet-bending service-page">
       <Reveal>
         <section className="sheet-bending-hero service-hero">
           <div className="container">
@@ -76,6 +101,7 @@ const SheetMetalBending = () => {
         </Reveal>
       </div>
     </div>
+    </>
   );
 };
 

@@ -1,12 +1,37 @@
 import React from 'react';
 import Reveal from '../components/Reveal';
 import Editable from '../components/Editable';
+import { useSEO } from '../hooks/useSEO';
+import StructuredData, { ServiceData, BreadcrumbData } from '../components/StructuredData';
 import '../styles/services.css';
 import './LaserCutting.css';
 
 const LaserCutting = () => {
+  // SEO настройки для страницы лазерной резки
+  useSEO({
+    title: 'Лазерная резка металла — ООО АФК «Урал» | Точная резка до 25 мм',
+    description: 'Лазерная резка металла на современном оборудовании IRON MAC 3015D-EP Т6. Мощность 6 кВт, рабочая область 3000×1500 мм, точность ±0.1 мм. Екатеринбург.',
+    keywords: 'лазерная резка, резка металла, IRON MAC, точная резка, металлообработка, Екатеринбург, АФК Урал, 6 кВт, 3000×1500 мм',
+    canonical: 'https://afk-ural.ru/metalworking/laser-cutting',
+    ogImage: 'https://afk-ural.ru/src/assets/logo_afk.jpg'
+  })
+
+  const serviceData = ServiceData(
+    'Лазерная резка металла',
+    'Точная резка металла на современном оборудовании IRON MAC 3015D-EP Т6. Мощность 6 кВт, рабочая область 3000×1500 мм, точность ±0.1 мм.',
+    'https://afk-ural.ru/metalworking/laser-cutting'
+  )
+
+  const breadcrumbData = BreadcrumbData([
+    { name: 'Главная', url: 'https://afk-ural.ru/' },
+    { name: 'Металлообработка', url: 'https://afk-ural.ru/metalworking' },
+    { name: 'Лазерная резка', url: 'https://afk-ural.ru/metalworking/laser-cutting' }
+  ])
   return (
-    <div className="laser service-page">
+    <>
+      <StructuredData data={serviceData} />
+      <StructuredData data={breadcrumbData} />
+      <div className="laser service-page">
       <Reveal>
         <section className="laser-hero service-hero">
           <div className="container">
@@ -76,6 +101,7 @@ const LaserCutting = () => {
         </Reveal>
       </div>
     </div>
+    </>
   );
 };
 

@@ -3,8 +3,23 @@ import axios from 'axios'
 import './Contacts.css'
 import Reveal from '../components/Reveal'
 import Editable from '../components/Editable'
+import { useSEO } from '../hooks/useSEO'
+import StructuredData, { ContactPageData, BreadcrumbData } from '../components/StructuredData'
 
 export default function Contacts() {
+  // SEO настройки для страницы контактов
+  useSEO({
+    title: 'Контакты — ООО АФК «Урал» | Свяжитесь с нами для заказа металлообработки',
+    description: 'Свяжитесь с ООО АФК «Урал» для заказа услуг металлообработки. Лазерная резка, гибка, сварка, окрашивание в Екатеринбурге. Телефон, email, форма обратной связи.',
+    keywords: 'контакты, связаться, заказ, металлообработка, лазерная резка, гибка, сварка, окрашивание, Екатеринбург, АФК Урал, телефон, email',
+    canonical: 'https://afk-ural.ru/contacts',
+    ogImage: 'https://afk-ural.ru/src/assets/logo_afk.jpg'
+  })
+
+  const breadcrumbData = BreadcrumbData([
+    { name: 'Главная', url: 'https://afk-ural.ru/' },
+    { name: 'Контакты', url: 'https://afk-ural.ru/contacts' }
+  ])
   const [form, setForm] = useState({ full_name: '', phone: '', email: '', comment: '' })
   const [sending, setSending] = useState(false)
   const [success, setSuccess] = useState('')
@@ -39,7 +54,10 @@ export default function Contacts() {
   }
 
   return (
-    <section className="contacts">
+    <>
+      <StructuredData data={ContactPageData} />
+      <StructuredData data={breadcrumbData} />
+      <section className="contacts">
       <Reveal as="div" className="contacts-hero">
         <div className="container">
           <Editable pageKey="contacts" blockKey="title" tag="h1" className="contacts-title" placeholder="Контакты" />
@@ -97,5 +115,6 @@ export default function Contacts() {
         </div>
       </div>
     </section>
+    </>
   )
 } 

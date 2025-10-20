@@ -1,10 +1,35 @@
 import './LiquidCoating.css'
 import Reveal from '../components/Reveal'
 import Editable from '../components/Editable'
+import { useSEO } from '../hooks/useSEO'
+import StructuredData, { ServiceData, BreadcrumbData } from '../components/StructuredData'
 
 export default function LiquidCoating() {
+  // SEO настройки для страницы жидкого окрашивания
+  useSEO({
+    title: 'Жидкое окрашивание — ООО АФК «Урал» | Покраска металла жидкими красками',
+    description: 'Жидкое окрашивание металла профессиональными красками. Качественная покраска металлических изделий в Екатеринбурге. Широкий выбор цветов и покрытий.',
+    keywords: 'жидкое окрашивание, покраска металла, жидкие краски, металлообработка, Екатеринбург, АФК Урал, профессиональные краски, покрытия',
+    canonical: 'https://afk-ural.ru/painting/liquid',
+    ogImage: 'https://afk-ural.ru/src/assets/logo_afk.jpg'
+  })
+
+  const serviceData = ServiceData(
+    'Жидкое окрашивание',
+    'Жидкое окрашивание металла профессиональными красками. Качественная покраска металлических изделий с широким выбором цветов и покрытий.',
+    'https://afk-ural.ru/painting/liquid'
+  )
+
+  const breadcrumbData = BreadcrumbData([
+    { name: 'Главная', url: 'https://afk-ural.ru/' },
+    { name: 'Окрашивание', url: 'https://afk-ural.ru/painting' },
+    { name: 'Жидкое окрашивание', url: 'https://afk-ural.ru/painting/liquid' }
+  ])
   return (
-    <section className="liquid">
+    <>
+      <StructuredData data={serviceData} />
+      <StructuredData data={breadcrumbData} />
+      <section className="liquid">
       <Reveal as="div" className="liquid-hero">
         <div className="container">
           <Editable pageKey="liquid" blockKey="title" tag="h1" className="liquid-title" placeholder="Жидкое окрашивание" />
@@ -64,5 +89,6 @@ export default function LiquidCoating() {
         </Reveal>
       </div>
     </section>
+    </>
   )
 } 

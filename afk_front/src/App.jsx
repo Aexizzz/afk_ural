@@ -15,6 +15,7 @@ import PowderCoating from './pages/PowderCoating.jsx'
 import LiquidCoating from './pages/LiquidCoating.jsx'
 import AdminPanel from './pages/AdminPanel.jsx'
 import ScrollTopButton from './components/ScrollTopButton'
+import SEOOptimizer from './components/SEOOptimizer'
 import { useEffect } from 'react'
 
 function ScrollToTopOnRoute() {
@@ -61,6 +62,7 @@ function AppShell() {
 function App() {
   return (
     <AuthProvider>
+      <SEOOptimizer />
       <Routes>
         {/* Админ-панель - доступна только по прямому URL */}
         <Route path="/admin" element={<AdminPanel />} />

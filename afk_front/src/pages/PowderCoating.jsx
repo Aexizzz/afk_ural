@@ -1,10 +1,35 @@
 import './PowderCoating.css'
 import Reveal from '../components/Reveal'
 import Editable from '../components/Editable'
+import { useSEO } from '../hooks/useSEO'
+import StructuredData, { ServiceData, BreadcrumbData } from '../components/StructuredData'
 
 export default function PowderCoating() {
+  // SEO настройки для страницы порошкового окрашивания
+  useSEO({
+    title: 'Порошковое окрашивание — ООО АФК «Урал» | Качественная покраска металла',
+    description: 'Порошковое окрашивание металла на современном оборудовании. Долговечная и качественная покраска металлических изделий в Екатеринбурге.',
+    keywords: 'порошковое окрашивание, покраска металла, порошковая краска, металлообработка, Екатеринбург, АФК Урал, долговечность, качество',
+    canonical: 'https://afk-ural.ru/painting/powder',
+    ogImage: 'https://afk-ural.ru/src/assets/logo_afk.jpg'
+  })
+
+  const serviceData = ServiceData(
+    'Порошковое окрашивание',
+    'Порошковое окрашивание металла на современном оборудовании. Долговечная и качественная покраска металлических изделий.',
+    'https://afk-ural.ru/painting/powder'
+  )
+
+  const breadcrumbData = BreadcrumbData([
+    { name: 'Главная', url: 'https://afk-ural.ru/' },
+    { name: 'Окрашивание', url: 'https://afk-ural.ru/painting' },
+    { name: 'Порошковое окрашивание', url: 'https://afk-ural.ru/painting/powder' }
+  ])
   return (
-    <section className="powder">
+    <>
+      <StructuredData data={serviceData} />
+      <StructuredData data={breadcrumbData} />
+      <section className="powder">
       <Reveal as="div" className="powder-hero">
         <div className="container">
           <Editable pageKey="powder" blockKey="title" tag="h1" className="powder-title" placeholder="Порошковое окрашивание" />
@@ -64,5 +89,6 @@ export default function PowderCoating() {
         </Reveal>
       </div>
     </section>
+    </>
   )
 } 
