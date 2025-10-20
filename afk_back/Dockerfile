@@ -1,32 +1,27 @@
-# Используем официальный Python образ
 FROM python:3.11-slim
 
-# Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Устанавливаем системные зависимости
+# Устанавливаем системные зависимости включая SSL
 RUN apt-get update && apt-get install -y \
     gcc \
     sqlite3 \
+    openssl \
     && rm -rf /var/lib/apt/lists/*
 
-# Копируем файл зависимостей
 COPY requirements.txt .
-
-# Устанавливаем Python зависимости
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Копируем код приложения
 COPY . .
 
-# Создаем директории для статических файлов и медиа
-RUN mkdir -p /app/static /app/media
+# Копируем SSL сертификаты
+#COPY ssl_certs/server.crt /app/ssl/server.crt
+#COPY ssl_certs/server.key /app/ssl/server.key
+#RUN mkdir -p /app/ssl
 
-# Собираем статические файлы
-RUN python manage.py collectstatic --noinput
+# Создаем исправленные настройки Django
+RUN echo "ALLOWED_HOSTS = ['*']" >> /app/afk_back/settings.py
+RUN echo "CORS_ALLOW_ALL_ORIGINS = True" >> /app/afk_back/settings.py
 
-# Открываем порт
-EXPOSE 8000
-
-# Команда запуска
+# Запускаем Django с SSL
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
