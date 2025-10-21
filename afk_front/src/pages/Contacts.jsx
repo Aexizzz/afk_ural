@@ -41,14 +41,14 @@ export default function Contacts() {
 
   // Функция валидации телефона
   const validatePhone = (phone) => {
-    // Удаляем все нецифровые символы, кроме +
-    const cleaned = phone.replace(/[^\d+]/g, '')
+    // Удаляем все нецифровые символы
+    const cleaned = phone.replace(/\D/g, '')
     
-    // Проверяем формат: начинается с 8 или +7, затем 10 цифр
-    const phoneRegex = /^(8|\+7)\d{10}$/
+    // Проверяем формат: начинается с 8, затем 10 цифр
+    const phoneRegex = /^8\d{10}$/
     
     if (!phoneRegex.test(cleaned)) {
-      return 'Телефон должен начинаться с 8 или +7 и содержать 10 цифр после этого'
+      return 'Телефон должен начинаться с 8 и содержать 10 цифр после этого (всего 11 цифр)'
     }
     
     return ''
@@ -95,27 +95,24 @@ export default function Contacts() {
     }
   }
 
-  // Функция для форматирования телефона (опционально)
+  // Функция для форматирования телефона
   const formatPhone = (value) => {
-    // Удаляем все нецифровые символы, кроме +
-    const cleaned = value.replace(/[^\d+]/g, '')
+    // Удаляем все нецифровые символы
+    const cleaned = value.replace(/\D/g, '')
     
-    // Форматируем номер по маске
-    if (cleaned.startsWith('+7')) {
-      if (cleaned.length <= 2) return cleaned
-      if (cleaned.length <= 5) return `+7 (${cleaned.slice(2, 5)}`
-      if (cleaned.length <= 8) return `+7 (${cleaned.slice(2, 5)}) ${cleaned.slice(5, 8)}`
-      if (cleaned.length <= 10) return `+7 (${cleaned.slice(2, 5)}) ${cleaned.slice(5, 8)}-${cleaned.slice(8, 10)}`
-      return `+7 (${cleaned.slice(2, 5)}) ${cleaned.slice(5, 8)}-${cleaned.slice(8, 10)}-${cleaned.slice(10, 12)}`
-    } else if (cleaned.startsWith('8')) {
-      if (cleaned.length === 1) return cleaned
-      if (cleaned.length <= 4) return `8 (${cleaned.slice(1, 4)}`
-      if (cleaned.length <= 7) return `8 (${cleaned.slice(1, 4)}) ${cleaned.slice(4, 7)}`
-      if (cleaned.length <= 9) return `8 (${cleaned.slice(1, 4)}) ${cleaned.slice(4, 7)}-${cleaned.slice(7, 9)}`
-      return `8 (${cleaned.slice(1, 4)}) ${cleaned.slice(4, 7)}-${cleaned.slice(7, 9)}-${cleaned.slice(9, 11)}`
+    // Если начинается не с 8, заменяем на 8
+    let processed = cleaned
+    if (cleaned.length > 0 && !cleaned.startsWith('8')) {
+      processed = '8' + cleaned.replace(/^8/, '').slice(0, 10)
     }
     
-    return cleaned
+    // Форматируем номер по маске
+    if (processed.length === 0) return ''
+    if (processed.length === 1) return processed
+    if (processed.length <= 4) return `8 (${processed.slice(1, 4)}`
+    if (processed.length <= 7) return `8 (${processed.slice(1, 4)}) ${processed.slice(4, 7)}`
+    if (processed.length <= 9) return `8 (${processed.slice(1, 4)}) ${processed.slice(4, 7)}-${processed.slice(7, 9)}`
+    return `8 (${processed.slice(1, 4)}) ${processed.slice(4, 7)}-${processed.slice(7, 9)}-${processed.slice(9, 11)}`
   }
 
   const handlePhoneChange = (e) => {
@@ -170,7 +167,7 @@ export default function Contacts() {
                     onChange={handlePhoneChange} 
                     required 
                     disabled={sending} 
-                    placeholder="+7 900 000 00 00" 
+                    placeholder="8 900 000 00 00" 
                   />
                   {phoneError && <div className="field-error">{phoneError}</div>}
                 </div>
