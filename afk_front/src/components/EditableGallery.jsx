@@ -16,7 +16,19 @@ export default function EditableGallery({ pageKey, blockKey = 'gallery' }) {
         const list = Array.isArray(resp.data) ? resp.data : (resp.data?.results || [])
         setItems(list.map(it => {
           const imageUrl = it.image?.startsWith('http') ? it.image : `${axios.defaults.baseURL?.replace('/api', '')}${it.image}`
-          console.log('Обработка изображения:', { original: it.image, processed: imageUrl, baseURL: axios.defaults.baseURL })
+          console.log('Обработка изображения:', { 
+            original: it.image, 
+            processed: imageUrl, 
+            baseURL: axios.defaults.baseURL,
+            fullUrl: imageUrl
+          })
+          
+          // Тестируем загрузку изображения
+          const testImg = new Image()
+          testImg.onload = () => console.log('✅ Изображение доступно:', imageUrl)
+          testImg.onerror = () => console.error('❌ Ошибка загрузки изображения:', imageUrl)
+          testImg.src = imageUrl
+          
           return { 
             id: it.id, 
             url: imageUrl, 
@@ -88,14 +100,21 @@ export default function EditableGallery({ pageKey, blockKey = 'gallery' }) {
             <div key={idx} className="gallery-card">
               <div className="gallery-image-wrap">
                 <img 
-                  src={it.url} 
+                  src={`${it.url}?t=${Date.now()}`}
                   alt={it.caption || `Фото ${idx+1}`}
                   onError={(e) => {
-                    console.error('Ошибка загрузки изображения:', it.url)
+                    console.error('❌ Ошибка загрузки изображения:', it.url)
+                    console.error('❌ Ошибка элемента:', e.target)
                     e.target.style.display = 'none'
                   }}
                   onLoad={() => {
-                    console.log('Изображение загружено:', it.url)
+                    console.log('✅ Изображение загружено в DOM:', it.url)
+                  }}
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'cover',
+                    display: 'block'
                   }}
                 />
                 {isAuthenticated && (

@@ -4,6 +4,7 @@ import Reveal from '../components/Reveal'
 import Editable from '../components/Editable'
 import EditableGallery from '../components/EditableGallery'
 import ImageDebug from '../components/ImageDebug'
+import ImageTest from '../components/ImageTest'
 import { useSEO } from '../hooks/useSEO'
 import StructuredData, { BreadcrumbData } from '../components/StructuredData'
 
@@ -49,6 +50,11 @@ export default function Products() {
         {/* Временный компонент для отладки */}
         <Reveal y={22}>
           <ImageDebug pageKey="products" />
+        </Reveal>
+
+        {/* Тест доступности изображений */}
+        <Reveal y={22}>
+          <ImageTest />
         </Reveal>
 
         <Reveal className="cta card" y={22}>
