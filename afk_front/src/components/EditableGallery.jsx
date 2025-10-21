@@ -12,8 +12,13 @@ export default function EditableGallery({ pageKey, blockKey = 'gallery' }) {
     const load = async () => {
       try {
         setLoading(true)
+        console.log('Загружаем изображения для страницы:', pageKey)
         const resp = await axios.get(`/gallery-images/?page_key=${encodeURIComponent(pageKey)}`)
+        console.log('Ответ сервера:', resp.data)
+        
         const list = Array.isArray(resp.data) ? resp.data : (resp.data?.results || [])
+        console.log('Найдено изображений:', list.length)
+        
         setItems(list.map(it => {
           const imageUrl = it.image?.startsWith('http') ? it.image : `${axios.defaults.baseURL?.replace('/api', '')}${it.image}`
           console.log('Обработка изображения:', { 
@@ -23,18 +28,23 @@ export default function EditableGallery({ pageKey, blockKey = 'gallery' }) {
             fullUrl: imageUrl
           })
           
-          // Тестируем загрузку изображения
-          const testImg = new Image()
-          testImg.onload = () => console.log('✅ Изображение доступно:', imageUrl)
-          testImg.onerror = () => console.error('❌ Ошибка загрузки изображения:', imageUrl)
-          testImg.src = imageUrl
-          
           return { 
             id: it.id, 
             url: imageUrl, 
             caption: it.caption 
           }
         }))
+      } catch (error) {
+        console.error('Ошибка загрузки изображений:', error)
+        console.error('Статус ошибки:', error.response?.status)
+        console.error('Данные ошибки:', error.response?.data)
+        
+        // Показываем сообщение об ошибке вместо пустой галереи
+        setItems([{
+          id: 'error',
+          url: '',
+          caption: 'Ошибка загрузки изображений. Проверьте подключение к серверу.'
+        }])
       } finally {
         setLoading(false)
       }
@@ -43,14 +53,31 @@ export default function EditableGallery({ pageKey, blockKey = 'gallery' }) {
   }, [pageKey])
 
   const uploadFile = async (file) => {
-    const form = new FormData()
-    form.append('page_key', pageKey)
-    form.append('image', file)
-    const resp = await axios.post('/gallery-images/', form, { headers: { 'Content-Type': 'multipart/form-data' }})
-    return { 
-      id: resp.data.id, 
-      url: resp.data.image?.startsWith('http') ? resp.data.image : `${axios.defaults.baseURL?.replace('/api', '')}${resp.data.image}`, 
-      caption: resp.data.caption 
+    try {
+      const form = new FormData()
+      form.append('page_key', pageKey)
+      form.append('image', file)
+      
+      console.log('Загружаем файл:', file.name, 'размер:', file.size)
+      
+      const resp = await axios.post('/gallery-images/', form, { 
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 30000 // 30 секунд таймаут
+      })
+      
+      console.log('Файл загружен успешно:', resp.data)
+      
+      return { 
+        id: resp.data.id, 
+        url: resp.data.image?.startsWith('http') ? resp.data.image : `${axios.defaults.baseURL?.replace('/api', '')}${resp.data.image}`, 
+        caption: resp.data.caption 
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки файла:', error)
+      console.error('Статус ошибки:', error.response?.status)
+      console.error('Данные ошибки:', error.response?.data)
+      
+      throw new Error(`Ошибка загрузки файла: ${error.response?.data?.detail || error.message}`)
     }
   }
 
@@ -62,12 +89,25 @@ export default function EditableGallery({ pageKey, blockKey = 'gallery' }) {
     input.onchange = async () => {
       const file = input.files?.[0]
       if (!file) return
-      const uploaded = await uploadFile(file)
-      const caption = window.prompt('Подпись (необязательно)') || ''
-      const next = [...items, { ...uploaded, caption }]
-      setItems(next)
-      if (uploaded.id) {
-        await axios.patch(`/gallery-images/${uploaded.id}/`, { caption })
+      
+      try {
+        console.log('Начинаем загрузку файла:', file.name)
+        const uploaded = await uploadFile(file)
+        const caption = window.prompt('Подпись (необязательно)') || ''
+        const next = [...items, { ...uploaded, caption }]
+        setItems(next)
+        
+        if (uploaded.id) {
+          try {
+            await axios.patch(`/gallery-images/${uploaded.id}/`, { caption })
+            console.log('Подпись обновлена')
+          } catch (error) {
+            console.error('Ошибка обновления подписи:', error)
+          }
+        }
+      } catch (error) {
+        console.error('Ошибка при добавлении файла:', error)
+        alert(`Ошибка загрузки файла: ${error.message}`)
       }
     }
     input.click()
@@ -94,6 +134,12 @@ export default function EditableGallery({ pageKey, blockKey = 'gallery' }) {
         <div className="loading" style={{padding:16}}>Загрузка…</div>
       ) : items.length === 0 ? (
         <div className="muted" style={{padding:16}}>Пока нет фото</div>
+      ) : items[0]?.id === 'error' ? (
+        <div style={{padding:16, backgroundColor:'#fee', border:'1px solid #fcc', borderRadius:'8px', color:'#c33'}}>
+          <strong>Ошибка загрузки изображений</strong><br/>
+          {items[0].caption}<br/>
+          <small>Проверьте подключение к серверу и попробуйте обновить страницу.</small>
+        </div>
       ) : (
         <div className="gallery-grid">
           {items.map((it, idx) => (
