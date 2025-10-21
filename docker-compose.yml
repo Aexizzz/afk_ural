@@ -37,6 +37,7 @@ services:
     #  - API_URL=http://backend:8000
     volumes:
       - /srv/afk_front/volumes:/etc/letsencrypt
+      - ./afk_back/media:/app/media
     networks:
       - afk_network
 

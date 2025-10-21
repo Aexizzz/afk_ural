@@ -235,7 +235,30 @@ class GalleryImageListCreateView(generics.ListCreateAPIView):
         return qs
 
     def perform_create(self, serializer):
-        serializer.save(uploaded_by=self.request.user)
+        import os
+        from django.conf import settings
+        
+        # Логируем информацию о загружаемом файле
+        print(f"🔍 Загружается файл: {self.request.FILES.get('image')}")
+        print(f"🔍 MEDIA_ROOT: {settings.MEDIA_ROOT}")
+        print(f"🔍 MEDIA_URL: {settings.MEDIA_URL}")
+        
+        # Проверяем существование папки
+        gallery_path = os.path.join(settings.MEDIA_ROOT, 'gallery')
+        print(f"🔍 Путь к папке gallery: {gallery_path}")
+        print(f"🔍 Папка существует: {os.path.exists(gallery_path)}")
+        print(f"🔍 Права на запись: {os.access(gallery_path, os.W_OK)}")
+        
+        # Сохраняем объект
+        instance = serializer.save(uploaded_by=self.request.user)
+        
+        # Проверяем, что файл действительно сохранился
+        if instance.image:
+            file_path = instance.image.path
+            print(f"🔍 Путь к сохраненному файлу: {file_path}")
+            print(f"🔍 Файл существует: {os.path.exists(file_path)}")
+            print(f"🔍 Размер файла: {os.path.getsize(file_path) if os.path.exists(file_path) else 'N/A'}")
+            print(f"🔍 URL файла: {instance.image.url}")
 
 
 class GalleryImageDetailView(generics.RetrieveUpdateDestroyAPIView):
