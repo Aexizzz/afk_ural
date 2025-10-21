@@ -49,6 +49,26 @@ export default function Products() {
           <EditableGallery pageKey="products" />
         </Reveal>
 
+        {/* Временный компонент для отладки */}
+        <Reveal y={22}>
+          <ImageDebug pageKey="products" />
+        </Reveal>
+
+        {/* Тест доступности изображений */}
+        <Reveal y={22}>
+          <ImageTest />
+        </Reveal>
+
+        {/* Диагностика сервера */}
+        <Reveal y={22}>
+          <ServerDiagnostics />
+        </Reveal>
+
+        {/* Тест URL изображения */}
+        <Reveal y={22}>
+          <ImageUrlTest />
+        </Reveal>
+
         <Reveal className="cta card" y={22}>
           <Editable pageKey="products" blockKey="cta_title" tag="h3" placeholder="Нужна консультация?" />
           <Editable pageKey="products" blockKey="cta_text" tag="p" placeholder="Призыв к действию" />
