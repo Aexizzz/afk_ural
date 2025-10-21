@@ -54,61 +54,35 @@ export default function Contacts() {
     return ''
   }
 
-  // Функция отправки email через EmailJS или аналогичный сервис
-  const sendEmailNotification = async (formData) => {
-    // Вариант 1: Использование EmailJS (нужно установить npm install emailjs-com)
-    try {
-      // Если используете EmailJS, раскомментируйте этот код
-      /*
-      const emailjs = await import('emailjs-com')
-      const templateParams = {
-        from_name: formData.full_name,
-        from_email: formData.email,
-        phone: formData.phone,
-        message: formData.comment || 'Не указано',
-        to_email: 'office@afkural.ru',
-        subject: `Новая заявка с сайта от ${formData.full_name}`
-      }
-
-      await emailjs.send(
-        'YOUR_SERVICE_ID', // Замените на ваш Service ID
-        'YOUR_TEMPLATE_ID', // Замените на ваш Template ID
-        templateParams,
-        'YOUR_PUBLIC_KEY' // Замените на ваш Public Key
-      )
-      */
-
-      // Вариант 2: Отправка через собственный API endpoint
-      await axios.post('/send-email/', {
-        to: 'ammelihov@gmail.com',
-        subject: `Новая заявка с сайта от ${formData.full_name}`,
-        html: `
-          <h2>Новая заявка с сайта АФК Урал</h2>
-          <p><strong>ФИО:</strong> ${formData.full_name}</p>
-          <p><strong>Телефон:</strong> ${formData.phone}</p>
-          <p><strong>Email:</strong> ${formData.email}</p>
-          <p><strong>Комментарий:</strong> ${formData.comment || 'Не указан'}</p>
-          <p><strong>Дата:</strong> ${new Date().toLocaleString('ru-RU')}</p>
-        `
-      })
-    } catch (emailError) {
-      console.warn('Не удалось отправить email уведомление:', emailError)
-      // Не прерываем основной поток, просто логируем ошибку
+  // Функция для форматирования телефона
+  const formatPhone = (value) => {
+    // Удаляем все нецифровые символы
+    const cleaned = value.replace(/\D/g, '')
+    
+    // Если начинается не с 8, заменяем на 8
+    let processed = cleaned
+    if (cleaned.length > 0 && !cleaned.startsWith('8')) {
+      processed = '8' + cleaned.replace(/^8/, '').slice(0, 10)
     }
+    
+    // Форматируем номер по маске
+    if (processed.length === 0) return ''
+    if (processed.length === 1) return processed
+    if (processed.length <= 4) return `8 (${processed.slice(1, 4)}`
+    if (processed.length <= 7) return `8 (${processed.slice(1, 4)}) ${processed.slice(4, 7)}`
+    if (processed.length <= 9) return `8 (${processed.slice(1, 4)}) ${processed.slice(4, 7)}-${processed.slice(7, 9)}`
+    return `8 (${processed.slice(1, 4)}) ${processed.slice(4, 7)}-${processed.slice(7, 9)}-${processed.slice(9, 11)}`
   }
 
-  // Вариант 3: Отправка через Formspree или аналогичный сервис
-  const sendFormspreeNotification = async (formData) => {
-    try {
-      await axios.post('https://formspree.io/f/your-form-id', {
-        name: formData.full_name,
-        phone: formData.phone,
-        email: formData.email,
-        message: formData.comment,
-        _subject: `Новая заявка с сайта от ${formData.full_name}`
-      })
-    } catch (formspreeError) {
-      console.warn('Не удалось отправить уведомление через Formspree:', formspreeError)
+  const handlePhoneChange = (e) => {
+    const formattedPhone = formatPhone(e.target.value)
+    setForm({ ...form, phone: formattedPhone })
+    
+    // Валидация в реальном времени
+    if (formattedPhone.trim() === '') {
+      setPhoneError('')
+    } else {
+      setPhoneError(validatePhone(formattedPhone))
     }
   }
 
@@ -142,55 +116,40 @@ export default function Contacts() {
     setPhoneError('')
 
     try {
-      // 1. Отправляем заявку на бэкенд
-      await axios.post('/contact-requests/', form)
+      // Отправляем заявку на бэкенд (бэкенд сам отправит email на office@afkural.ru)
+      const response = await axios.post('/contact-requests/', form)
       
-      // 2. Отправляем уведомление на email
-      await sendEmailNotification(form)
-      
-      // 3. Дополнительно можно отправить через Formspree (раскомментируйте если нужно)
-      // await sendFormspreeNotification(form)
-
       setSuccess('Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.')
       setForm({ full_name: '', phone: '', email: '', comment: '' })
     } catch (err) {
       console.error('Ошибка отправки заявки:', err)
-      const errMsg = err.response?.data?.detail || 'Ошибка при отправке. Проверьте данные и повторите попытку.'
+      
+      let errMsg = 'Ошибка при отправке. Проверьте данные и повторите попытку.'
+      
+      if (err.response?.data) {
+        // Обрабатываем ошибки валидации Django
+        if (typeof err.response.data === 'object') {
+          const errors = []
+          for (const key in err.response.data) {
+            if (Array.isArray(err.response.data[key])) {
+              errors.push(...err.response.data[key])
+            } else {
+              errors.push(err.response.data[key])
+            }
+          }
+          errMsg = errors.join(', ')
+        } else if (typeof err.response.data === 'string') {
+          errMsg = err.response.data
+        } else if (err.response.data.detail) {
+          errMsg = err.response.data.detail
+        }
+      } else if (err.request) {
+        errMsg = 'Не удалось подключиться к серверу. Проверьте интернет-соединение.'
+      }
+      
       setError(errMsg)
     } finally {
       setSending(false)
-    }
-  }
-
-  // Функция для форматирования телефона
-  const formatPhone = (value) => {
-    // Удаляем все нецифровые символы
-    const cleaned = value.replace(/\D/g, '')
-    
-    // Если начинается не с 8, заменяем на 8
-    let processed = cleaned
-    if (cleaned.length > 0 && !cleaned.startsWith('8')) {
-      processed = '8' + cleaned.replace(/^8/, '').slice(0, 10)
-    }
-    
-    // Форматируем номер по маске
-    if (processed.length === 0) return ''
-    if (processed.length === 1) return processed
-    if (processed.length <= 4) return `8 (${processed.slice(1, 4)}`
-    if (processed.length <= 7) return `8 (${processed.slice(1, 4)}) ${processed.slice(4, 7)}`
-    if (processed.length <= 9) return `8 (${processed.slice(1, 4)}) ${processed.slice(4, 7)}-${processed.slice(7, 9)}`
-    return `8 (${processed.slice(1, 4)}) ${processed.slice(4, 7)}-${processed.slice(7, 9)}-${processed.slice(9, 11)}`
-  }
-
-  const handlePhoneChange = (e) => {
-    const formattedPhone = formatPhone(e.target.value)
-    setForm({ ...form, phone: formattedPhone })
-    
-    // Валидация в реальном времени
-    if (formattedPhone.trim() === '') {
-      setPhoneError('')
-    } else {
-      setPhoneError(validatePhone(formattedPhone))
     }
   }
 
@@ -199,72 +158,236 @@ export default function Contacts() {
       <StructuredData data={ContactPageData} />
       <StructuredData data={breadcrumbData} />
       <section className="contacts">
-      <Reveal as="div" className="contacts-hero">
+        <Reveal as="div" className="contacts-hero">
+          <div className="container">
+            <Editable 
+              pageKey="contacts" 
+              blockKey="title" 
+              tag="h1" 
+              className="contacts-title" 
+              placeholder="Контакты" 
+            />
+            <Editable 
+              pageKey="contacts" 
+              blockKey="subtitle" 
+              tag="p" 
+              className="contacts-subtitle" 
+              placeholder="Будем рады обсудить вашу задачу" 
+            />
+          </div>
+        </Reveal>
+
         <div className="container">
-          <Editable pageKey="contacts" blockKey="title" tag="h1" className="contacts-title" placeholder="Контакты" />
-          <Editable pageKey="contacts" blockKey="subtitle" tag="p" className="contacts-subtitle" placeholder="Будем рады обсудить вашу задачу" />
-        </div>
-      </Reveal>
+          <div className="grid">
+            <Reveal className="card info" y={18}>
+              <Editable 
+                pageKey="contacts" 
+                blockKey="info_title" 
+                tag="h2" 
+                placeholder="Свяжитесь с нами" 
+              />
+              <ul className="details">
+                <li>
+                  <strong>Адрес:</strong>{' '}
+                  <Editable 
+                    pageKey="contacts" 
+                    blockKey="addr" 
+                    tag="span" 
+                    placeholder="г. Челябинск, ул. Строительная, 3" 
+                  />
+                </li>
+                <li>
+                  <strong>Телефон:</strong>{' '}
+                  <a href="tel:+79823363480">
+                    <Editable 
+                      pageKey="contacts" 
+                      blockKey="phone" 
+                      tag="span" 
+                      placeholder="+7 982 336 3480" 
+                    />
+                  </a>
+                </li>
+                <li>
+                  <strong>Email:</strong>{' '}
+                  <a href="mailto:office@afkural.ru">
+                    <Editable 
+                      pageKey="contacts" 
+                      blockKey="email" 
+                      tag="span" 
+                      placeholder="office@afkural.ru" 
+                    />
+                  </a>
+                </li>
+                <li>
+                  <strong>Режим работы:</strong>{' '}
+                  <Editable 
+                    pageKey="contacts" 
+                    blockKey="work_hours" 
+                    tag="span" 
+                    placeholder="Пн-Пт: 9:00-18:00" 
+                  />
+                </li>
+              </ul>
+            </Reveal>
 
-      <div className="container">
-        <div className="grid">
-          <Reveal className="card info" y={18}>
-            <Editable pageKey="contacts" blockKey="info_title" tag="h2" placeholder="Свяжитесь с нами" />
-            <ul className="details">
-              <li><strong>Адрес:</strong> <Editable pageKey="contacts" blockKey="addr" tag="span" placeholder="г. Челябинск, ул. Строительная, 3" /></li>
-              <li><strong>Телефон:</strong> <a href="tel:+79823363480"><Editable pageKey="contacts" blockKey="phone" tag="span" placeholder="+7 982 336 3480" /></a></li>
-              <li><strong>Email:</strong> <a href="mailto:office@afkural.ru"><Editable pageKey="contacts" blockKey="email" tag="span" placeholder="office@afkural.ru" /></a></li>
-            </ul>
-          </Reveal>
-
-          <Reveal className="card form-card" y={18}>
-            <Editable pageKey="contacts" blockKey="form_title" tag="h2" placeholder="Оставить заявку" />
-            <form onSubmit={handleSubmit} className="contact-form">
-              <div className="row">
-                <div className="field">
-                  <label htmlFor="full_name"><Editable pageKey="contacts" blockKey="label_fullname" tag="span" placeholder="ФИО *" /></label>
-                  <input id="full_name" name="full_name" value={form.full_name} onChange={handleChange} required disabled={sending} />
+            <Reveal className="card form-card" y={18}>
+              <Editable 
+                pageKey="contacts" 
+                blockKey="form_title" 
+                tag="h2" 
+                placeholder="Оставить заявку" 
+              />
+              <Editable 
+                pageKey="contacts" 
+                blockKey="form_subtitle" 
+                tag="p" 
+                className="form-subtitle" 
+                placeholder="Заполните форму и мы свяжемся с вами в течение 30 минут" 
+              />
+              
+              <form onSubmit={handleSubmit} className="contact-form">
+                <div className="row">
+                  <div className="field">
+                    <label htmlFor="full_name">
+                      <Editable 
+                        pageKey="contacts" 
+                        blockKey="label_fullname" 
+                        tag="span" 
+                        placeholder="ФИО *" 
+                      />
+                    </label>
+                    <input 
+                      id="full_name" 
+                      name="full_name" 
+                      value={form.full_name} 
+                      onChange={handleChange} 
+                      required 
+                      disabled={sending}
+                      placeholder="Иванов Иван Иванович"
+                    />
+                  </div>
+                  <div className="field">
+                    <label htmlFor="phone">
+                      <Editable 
+                        pageKey="contacts" 
+                        blockKey="label_phone" 
+                        tag="span" 
+                        placeholder="Телефон *" 
+                      />
+                    </label>
+                    <input 
+                      id="phone" 
+                      name="phone" 
+                      value={form.phone} 
+                      onChange={handlePhoneChange} 
+                      required 
+                      disabled={sending} 
+                      placeholder="8 900 000 00 00" 
+                    />
+                    {phoneError && <div className="field-error">{phoneError}</div>}
+                  </div>
                 </div>
+
                 <div className="field">
-                  <label htmlFor="phone"><Editable pageKey="contacts" blockKey="label_phone" tag="span" placeholder="Телефон *" /></label>
+                  <label htmlFor="email">
+                    <Editable 
+                      pageKey="contacts" 
+                      blockKey="label_email" 
+                      tag="span" 
+                      placeholder="Электронная почта *" 
+                    />
+                  </label>
                   <input 
-                    id="phone" 
-                    name="phone" 
-                    value={form.phone} 
-                    onChange={handlePhoneChange} 
+                    id="email" 
+                    type="email" 
+                    name="email" 
+                    value={form.email} 
+                    onChange={handleChange} 
                     required 
                     disabled={sending} 
-                    placeholder="8 900 000 00 00" 
+                    placeholder="example@mail.ru" 
                   />
-                  {phoneError && <div className="field-error">{phoneError}</div>}
                 </div>
-              </div>
 
-              <div className="field">
-                <label htmlFor="email"><Editable pageKey="contacts" blockKey="label_email" tag="span" placeholder="Электронная почта *" /></label>
-                <input id="email" type="email" name="email" value={form.email} onChange={handleChange} required disabled={sending} placeholder="example@mail.ru" />
-              </div>
+                <div className="field">
+                  <label htmlFor="comment">
+                    <Editable 
+                      pageKey="contacts" 
+                      blockKey="label_comment" 
+                      tag="span" 
+                      placeholder="Комментарий" 
+                    />
+                  </label>
+                  <textarea 
+                    id="comment" 
+                    name="comment" 
+                    value={form.comment} 
+                    onChange={handleChange} 
+                    rows={4} 
+                    disabled={sending} 
+                    placeholder="Кратко опишите задачу, например: 'Нужна лазерная резка металла толщиной 3 мм'"
+                  />
+                </div>
 
-              <div className="field">
-                <label htmlFor="comment"><Editable pageKey="contacts" blockKey="label_comment" tag="span" placeholder="Комментарий" /></label>
-                <textarea id="comment" name="comment" value={form.comment} onChange={handleChange} rows={4} disabled={sending} placeholder="Кратко опишите задачу" />
-              </div>
+                <button 
+                  type="submit" 
+                  className={`btn ${sending ? 'btn-loading' : ''}`} 
+                  disabled={sending || phoneError}
+                >
+                  {sending ? (
+                    <>
+                      <span className="spinner"></span>
+                      Отправка...
+                    </>
+                  ) : (
+                    'Отправить заявку'
+                  )}
+                </button>
 
-              <button type="submit" className="btn" disabled={sending || phoneError}>
-                {sending ? 'Отправка...' : 'Отправить заявку'}
-              </button>
+                <p className="policy-note">
+                  <Editable 
+                    pageKey="contacts" 
+                    blockKey="policy_text" 
+                    tag="span" 
+                    placeholder="Отправляя заявку, вы соглашаетесь с политикой конфиденциальности" 
+                  />
+                  {' '}
+                  <a href="/privacy" target="_blank" rel="noopener noreferrer">
+                    <Editable 
+                      pageKey="contacts" 
+                      blockKey="policy_link" 
+                      tag="span" 
+                      placeholder="политикой конфиденциальности" 
+                    />
+                  </a>
+                </p>
 
-              <p className="policy-note" style={{fontSize: 12, color: '#6b7280', marginTop: 8}}>
-                Отправляя заявку, вы соглашаетесь с <a href="/privacy" target="_blank" rel="noopener noreferrer">политикой конфиденциальности</a>.
-              </p>
-
-              {success && <div className="alert success">{success}</div>}
-              {error && <div className="alert error">{error}</div>}
-            </form>
-          </Reveal>
+                {success && (
+                  <div className="alert success">
+                    <div className="alert-icon">✓</div>
+                    <div className="alert-content">
+                      <strong>Успешно!</strong>
+                      <br />
+                      {success}
+                    </div>
+                  </div>
+                )}
+                
+                {error && (
+                  <div className="alert error">
+                    <div className="alert-icon">⚠</div>
+                    <div className="alert-content">
+                      <strong>Ошибка!</strong>
+                      <br />
+                      {error}
+                    </div>
+                  </div>
+                )}
+              </form>
+            </Reveal>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
     </>
   )
 }
