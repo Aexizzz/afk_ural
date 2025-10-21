@@ -49,7 +49,7 @@ export default function ImageUrlTest() {
   }
 
   const testCurrentImage = () => {
-    const url = 'http://afkural.ru/media/gallery/бердик_bnsawFY.jpg'
+    const url = 'https://afkural.ru/media/gallery/бердик_bnsawFY.jpg'
     setTestUrl(url)
     testImageUrl(url)
   }

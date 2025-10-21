@@ -27,7 +27,14 @@ export default function Contacts() {
 
   // Базовый URL настраивается из переменных окружения Vite
   if (!axios.defaults.baseURL) {
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://176.109.105.158:8000/api'
+    let apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://afkural.ru/api'
+    
+    // Принудительно используем HTTPS для предотвращения Mixed Content
+    if (apiBaseUrl.startsWith('http://')) {
+      apiBaseUrl = apiBaseUrl.replace('http://', 'https://')
+      console.log('🔄 Изменен baseURL на HTTPS:', apiBaseUrl)
+    }
+    
     axios.defaults.baseURL = apiBaseUrl
   }
 

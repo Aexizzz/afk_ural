@@ -22,6 +22,12 @@ export default function EditableGallery({ pageKey, blockKey = 'gallery' }) {
         setItems(list.map(it => {
           let imageUrl = it.image?.startsWith('http') ? it.image : `${axios.defaults.baseURL?.replace('/api', '')}${it.image}`
           
+          // Принудительно используем HTTPS для предотвращения Mixed Content
+          if (imageUrl.startsWith('http://')) {
+            imageUrl = imageUrl.replace('http://', 'https://')
+            console.log('🔄 Изменен протокол на HTTPS:', imageUrl)
+          }
+          
           // Декодируем URL если он содержит URL-кодированные символы
           try {
             imageUrl = decodeURIComponent(imageUrl)
@@ -76,6 +82,12 @@ export default function EditableGallery({ pageKey, blockKey = 'gallery' }) {
       console.log('Файл загружен успешно:', resp.data)
       
       let imageUrl = resp.data.image?.startsWith('http') ? resp.data.image : `${axios.defaults.baseURL?.replace('/api', '')}${resp.data.image}`
+      
+      // Принудительно используем HTTPS для предотвращения Mixed Content
+      if (imageUrl.startsWith('http://')) {
+        imageUrl = imageUrl.replace('http://', 'https://')
+        console.log('🔄 Изменен протокол на HTTPS:', imageUrl)
+      }
       
       // Декодируем URL если он содержит URL-кодированные символы
       try {

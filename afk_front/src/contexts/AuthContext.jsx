@@ -19,6 +19,12 @@ export const AuthProvider = ({ children }) => {
   // Настройка axios baseURL из переменных окружения Vite
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://afkural.ru/api';
   axios.defaults.baseURL = apiBaseUrl;
+  
+  // Принудительно используем HTTPS для предотвращения Mixed Content
+  if (axios.defaults.baseURL?.startsWith('http://')) {
+    axios.defaults.baseURL = axios.defaults.baseURL.replace('http://', 'https://');
+    console.log('🔄 Изменен baseURL на HTTPS:', axios.defaults.baseURL);
+  }
 
   // Добавляем токен к запросам
   useEffect(() => {
