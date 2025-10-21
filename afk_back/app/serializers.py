@@ -80,8 +80,9 @@ class ContactRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactRequest
         fields = ['id', 'full_name', 'phone', 'email', 'comment', 'status', 
-                 'created_at', 'processed_by']
-        read_only_fields = ['id', 'status', 'created_at', 'processed_by']
+                 'created_at', 'processed_by', 'email_sent', 'email_sent_at']
+        read_only_fields = ['id', 'status', 'created_at', 'processed_by', 'email_sent', 'email_sent_at']
+
 
 class ContactRequestAdminSerializer(serializers.ModelSerializer):
     """Сериализатор для административного просмотра заявок"""
@@ -90,8 +91,9 @@ class ContactRequestAdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactRequest
         fields = ['id', 'full_name', 'phone', 'email', 'comment', 'status', 
-                 'created_at', 'updated_at', 'processed_by', 'processed_by_name']
-        read_only_fields = ['id', 'created_at', 'updated_at', 'processed_by_name'] 
+                 'created_at', 'updated_at', 'processed_by', 'processed_by_name',
+                 'email_sent', 'email_sent_at']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'processed_by_name', 'email_sent', 'email_sent_at']
 
 
 class ContentBlockSerializer(serializers.ModelSerializer):

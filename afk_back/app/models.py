@@ -45,6 +45,8 @@ class ContactRequest(models.Model):
         blank=True, 
         verbose_name="Обработал"
     )
+    email_sent = models.BooleanField(default=False, verbose_name="Email отправлен")
+    email_sent_at = models.DateTimeField(null=True, blank=True, verbose_name="Время отправки email")
 
     class Meta:
         verbose_name = "Заявка на связь"
@@ -101,3 +103,4 @@ class GalleryImage(models.Model):
 
     def __str__(self):
         return f"{self.page_key}:{self.id}"
+

@@ -16,6 +16,8 @@ from .serializers import (
     ContentBlockSerializer,
     GalleryImageSerializer
 )
+from .email_service import send_contact_request_email
+from django.utils import timezone
 
 # Create your views here.
 
@@ -265,3 +267,29 @@ class GalleryImageDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = GalleryImageSerializer
     queryset = GalleryImage.objects.all()
     permission_classes = [permissions.IsAuthenticated]
+
+class ContactRequestCreateView(generics.CreateAPIView):
+    """Представление для создания заявки на связь (доступно всем)"""
+    queryset = ContactRequest.objects.all()
+    serializer_class = ContactRequestSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        contact_request = serializer.save()
+        
+        # Отправляем email уведомление
+        try:
+            email_sent = send_contact_request_email(contact_request)
+            if email_sent:
+                print(f"✅ Email уведомление отправлено для заявки #{contact_request.id}")
+            else:
+                print(f"❌ Не удалось отправить email для заявки #{contact_request.id}")
+        except Exception as e:
+            print(f"⚠️ Ошибка при отправке email: {e}")
+        
+        return Response({
+            'message': 'Заявка успешно отправлена',
+            'contact_request': ContactRequestSerializer(contact_request).data
+        }, status=status.HTTP_201_CREATED)

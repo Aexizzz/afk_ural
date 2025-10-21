@@ -190,3 +190,12 @@ CORS_ALLOWED_ORIGINS = [
 
 # Admin registration code
 ADMIN_REGISTRATION_CODE = 'AFK2024ADMIN'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.yandex.ru'  # или smtp.gmail.com, smtp.mail.ru
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'noreply@afkural.ru'  # email для отправки
+EMAIL_HOST_PASSWORD = 'your-app-password'  # пароль приложения (не основной пароль!)
+DEFAULT_FROM_EMAIL = 'АФК Урал <noreply@afkural.ru>'
+ADMIN_EMAIL = 'ammelihov@gmail.com'  # email для получения заявок
