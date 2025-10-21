@@ -54,6 +54,64 @@ export default function Contacts() {
     return ''
   }
 
+  // Функция отправки email через EmailJS или аналогичный сервис
+  const sendEmailNotification = async (formData) => {
+    // Вариант 1: Использование EmailJS (нужно установить npm install emailjs-com)
+    try {
+      // Если используете EmailJS, раскомментируйте этот код
+      /*
+      const emailjs = await import('emailjs-com')
+      const templateParams = {
+        from_name: formData.full_name,
+        from_email: formData.email,
+        phone: formData.phone,
+        message: formData.comment || 'Не указано',
+        to_email: 'office@afkural.ru',
+        subject: `Новая заявка с сайта от ${formData.full_name}`
+      }
+
+      await emailjs.send(
+        'YOUR_SERVICE_ID', // Замените на ваш Service ID
+        'YOUR_TEMPLATE_ID', // Замените на ваш Template ID
+        templateParams,
+        'YOUR_PUBLIC_KEY' // Замените на ваш Public Key
+      )
+      */
+
+      // Вариант 2: Отправка через собственный API endpoint
+      await axios.post('/send-email/', {
+        to: 'ammelihov@gmail.com',
+        subject: `Новая заявка с сайта от ${formData.full_name}`,
+        html: `
+          <h2>Новая заявка с сайта АФК Урал</h2>
+          <p><strong>ФИО:</strong> ${formData.full_name}</p>
+          <p><strong>Телефон:</strong> ${formData.phone}</p>
+          <p><strong>Email:</strong> ${formData.email}</p>
+          <p><strong>Комментарий:</strong> ${formData.comment || 'Не указан'}</p>
+          <p><strong>Дата:</strong> ${new Date().toLocaleString('ru-RU')}</p>
+        `
+      })
+    } catch (emailError) {
+      console.warn('Не удалось отправить email уведомление:', emailError)
+      // Не прерываем основной поток, просто логируем ошибку
+    }
+  }
+
+  // Вариант 3: Отправка через Formspree или аналогичный сервис
+  const sendFormspreeNotification = async (formData) => {
+    try {
+      await axios.post('https://formspree.io/f/your-form-id', {
+        name: formData.full_name,
+        phone: formData.phone,
+        email: formData.email,
+        message: formData.comment,
+        _subject: `Новая заявка с сайта от ${formData.full_name}`
+      })
+    } catch (formspreeError) {
+      console.warn('Не удалось отправить уведомление через Formspree:', formspreeError)
+    }
+  }
+
   const handleChange = (e) => {
     const { name, value } = e.target
     setForm({ ...form, [name]: value })
@@ -84,10 +142,19 @@ export default function Contacts() {
     setPhoneError('')
 
     try {
+      // 1. Отправляем заявку на бэкенд
       await axios.post('/contact-requests/', form)
-      setSuccess('Заявка успешно отправлена!')
+      
+      // 2. Отправляем уведомление на email
+      await sendEmailNotification(form)
+      
+      // 3. Дополнительно можно отправить через Formspree (раскомментируйте если нужно)
+      // await sendFormspreeNotification(form)
+
+      setSuccess('Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.')
       setForm({ full_name: '', phone: '', email: '', comment: '' })
     } catch (err) {
+      console.error('Ошибка отправки заявки:', err)
       const errMsg = err.response?.data?.detail || 'Ошибка при отправке. Проверьте данные и повторите попытку.'
       setError(errMsg)
     } finally {
