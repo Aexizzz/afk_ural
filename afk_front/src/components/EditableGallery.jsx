@@ -93,15 +93,11 @@ export default function EditableGallery({ pageKey, blockKey = 'gallery' }) {
                   onError={(e) => {
                     console.error('Ошибка загрузки изображения:', it.url)
                     e.target.style.display = 'none'
-                    e.target.nextSibling?.style.display = 'block'
                   }}
                   onLoad={() => {
                     console.log('Изображение загружено:', it.url)
                   }}
                 />
-                <div style={{display: 'none', padding: '20px', textAlign: 'center', color: '#666'}}>
-                  Ошибка загрузки изображения
-                </div>
                 {isAuthenticated && (
                   <button className="gallery-remove" onClick={() => onRemove(idx)} title="Удалить">×</button>
                 )}
