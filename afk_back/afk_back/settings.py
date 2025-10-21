@@ -127,6 +127,10 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Дополнительные настройки для медиафайлов
+MEDIA_FILES_PERMISSIONS = 0o644
+MEDIA_DIRECTORIES_PERMISSIONS = 0o755
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

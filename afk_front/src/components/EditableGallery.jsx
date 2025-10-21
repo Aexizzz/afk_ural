@@ -169,10 +169,33 @@ export default function EditableGallery({ pageKey, blockKey = 'gallery' }) {
                     console.error('❌ Ошибка загрузки изображения:', it.url)
                     console.error('❌ Ошибка элемента:', e.target)
                     
+                    // Предотвращаем бесконечный цикл
+                    if (e.target.dataset.retryAttempted) {
+                      console.log('🔄 Повторная попытка уже была, показываем placeholder')
+                      e.target.style.display = 'none'
+                      const placeholder = document.createElement('div')
+                      placeholder.style.cssText = `
+                        width: 100%; 
+                        height: 100%; 
+                        background: #f0f0f0; 
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center; 
+                        color: #666; 
+                        font-size: 12px;
+                        text-align: center;
+                        padding: 10px;
+                      `
+                      placeholder.textContent = 'Изображение недоступно'
+                      e.target.parentNode.appendChild(placeholder)
+                      return
+                    }
+                    
                     // Пробуем загрузить оригинальный URL без параметров
                     const originalUrl = it.url.split('?')[0]
                     if (e.target.src !== originalUrl) {
                       console.log('🔄 Пробуем загрузить оригинальный URL:', originalUrl)
+                      e.target.dataset.retryAttempted = 'true'
                       e.target.src = originalUrl
                     } else {
                       // Показываем placeholder если изображение не загружается
