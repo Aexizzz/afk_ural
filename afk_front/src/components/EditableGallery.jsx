@@ -20,7 +20,15 @@ export default function EditableGallery({ pageKey, blockKey = 'gallery' }) {
         console.log('Найдено изображений:', list.length)
         
         setItems(list.map(it => {
-          const imageUrl = it.image?.startsWith('http') ? it.image : `${axios.defaults.baseURL?.replace('/api', '')}${it.image}`
+          let imageUrl = it.image?.startsWith('http') ? it.image : `${axios.defaults.baseURL?.replace('/api', '')}${it.image}`
+          
+          // Декодируем URL если он содержит URL-кодированные символы
+          try {
+            imageUrl = decodeURIComponent(imageUrl)
+          } catch (e) {
+            console.warn('Не удалось декодировать URL:', imageUrl)
+          }
+          
           console.log('Обработка изображения:', { 
             original: it.image, 
             processed: imageUrl, 
@@ -67,9 +75,18 @@ export default function EditableGallery({ pageKey, blockKey = 'gallery' }) {
       
       console.log('Файл загружен успешно:', resp.data)
       
+      let imageUrl = resp.data.image?.startsWith('http') ? resp.data.image : `${axios.defaults.baseURL?.replace('/api', '')}${resp.data.image}`
+      
+      // Декодируем URL если он содержит URL-кодированные символы
+      try {
+        imageUrl = decodeURIComponent(imageUrl)
+      } catch (e) {
+        console.warn('Не удалось декодировать URL:', imageUrl)
+      }
+      
       return { 
         id: resp.data.id, 
-        url: resp.data.image?.startsWith('http') ? resp.data.image : `${axios.defaults.baseURL?.replace('/api', '')}${resp.data.image}`, 
+        url: imageUrl, 
         caption: resp.data.caption 
       }
     } catch (error) {
@@ -151,7 +168,31 @@ export default function EditableGallery({ pageKey, blockKey = 'gallery' }) {
                   onError={(e) => {
                     console.error('❌ Ошибка загрузки изображения:', it.url)
                     console.error('❌ Ошибка элемента:', e.target)
-                    e.target.style.display = 'none'
+                    
+                    // Пробуем загрузить оригинальный URL без параметров
+                    const originalUrl = it.url.split('?')[0]
+                    if (e.target.src !== originalUrl) {
+                      console.log('🔄 Пробуем загрузить оригинальный URL:', originalUrl)
+                      e.target.src = originalUrl
+                    } else {
+                      // Показываем placeholder если изображение не загружается
+                      e.target.style.display = 'none'
+                      const placeholder = document.createElement('div')
+                      placeholder.style.cssText = `
+                        width: 100%; 
+                        height: 100%; 
+                        background: #f0f0f0; 
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center; 
+                        color: #666; 
+                        font-size: 12px;
+                        text-align: center;
+                        padding: 10px;
+                      `
+                      placeholder.textContent = 'Изображение недоступно'
+                      e.target.parentNode.appendChild(placeholder)
+                    }
                   }}
                   onLoad={() => {
                     console.log('✅ Изображение загружено в DOM:', it.url)

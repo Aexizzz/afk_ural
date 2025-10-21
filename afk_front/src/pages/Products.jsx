@@ -6,6 +6,7 @@ import EditableGallery from '../components/EditableGallery'
 import ImageDebug from '../components/ImageDebug'
 import ImageTest from '../components/ImageTest'
 import ServerDiagnostics from '../components/ServerDiagnostics'
+import ImageUrlTest from '../components/ImageUrlTest'
 import { useSEO } from '../hooks/useSEO'
 import StructuredData, { BreadcrumbData } from '../components/StructuredData'
 
@@ -61,6 +62,11 @@ export default function Products() {
         {/* Диагностика сервера */}
         <Reveal y={22}>
           <ServerDiagnostics />
+        </Reveal>
+
+        {/* Тест URL изображения */}
+        <Reveal y={22}>
+          <ImageUrlTest />
         </Reveal>
 
         <Reveal className="cta card" y={22}>
