@@ -30,9 +30,19 @@ RUN touch /app/media/gallery/.gitkeep
 # Устанавливаем права доступа
 RUN chmod -R 755 /app/media
 
+# Создаем скрипт исправления папок
+RUN echo '#!/bin/bash' > /app/fix_media_folders.sh && \
+    echo 'mkdir -p /app/media/gallery' >> /app/fix_media_folders.sh && \
+    echo 'chmod -R 755 /app/media' >> /app/fix_media_folders.sh && \
+    echo 'touch /app/media/gallery/.gitkeep' >> /app/fix_media_folders.sh && \
+    echo 'echo "Папки созданы: $(ls -la /app/media/)"' >> /app/fix_media_folders.sh && \
+    chmod +x /app/fix_media_folders.sh
+
 # Создаем скрипт запуска
 RUN echo '#!/bin/bash' > /app/start.sh && \
-    echo 'python manage.py setup_media' >> /app/start.sh && \
+    echo 'echo "🔧 Создание папок медиафайлов..."' >> /app/start.sh && \
+    echo '/app/fix_media_folders.sh' >> /app/start.sh && \
+    echo 'echo "🚀 Запуск Django сервера..."' >> /app/start.sh && \
     echo 'python manage.py runserver 0.0.0.0:8000' >> /app/start.sh && \
     chmod +x /app/start.sh
 
