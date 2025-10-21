@@ -14,7 +14,15 @@ export default function EditableGallery({ pageKey, blockKey = 'gallery' }) {
         setLoading(true)
         const resp = await axios.get(`/gallery-images/?page_key=${encodeURIComponent(pageKey)}`)
         const list = Array.isArray(resp.data) ? resp.data : (resp.data?.results || [])
-        setItems(list.map(it => ({ id: it.id, url: it.image, caption: it.caption })))
+        setItems(list.map(it => {
+          const imageUrl = it.image?.startsWith('http') ? it.image : `${axios.defaults.baseURL?.replace('/api', '')}${it.image}`
+          console.log('Обработка изображения:', { original: it.image, processed: imageUrl, baseURL: axios.defaults.baseURL })
+          return { 
+            id: it.id, 
+            url: imageUrl, 
+            caption: it.caption 
+          }
+        }))
       } finally {
         setLoading(false)
       }
@@ -27,7 +35,11 @@ export default function EditableGallery({ pageKey, blockKey = 'gallery' }) {
     form.append('page_key', pageKey)
     form.append('image', file)
     const resp = await axios.post('/gallery-images/', form, { headers: { 'Content-Type': 'multipart/form-data' }})
-    return { id: resp.data.id, url: resp.data.image, caption: resp.data.caption }
+    return { 
+      id: resp.data.id, 
+      url: resp.data.image?.startsWith('http') ? resp.data.image : `${axios.defaults.baseURL?.replace('/api', '')}${resp.data.image}`, 
+      caption: resp.data.caption 
+    }
   }
 
   const onAdd = async () => {
@@ -75,7 +87,21 @@ export default function EditableGallery({ pageKey, blockKey = 'gallery' }) {
           {items.map((it, idx) => (
             <div key={idx} className="gallery-card">
               <div className="gallery-image-wrap">
-                <img src={it.url} alt={it.caption || `Фото ${idx+1}`} />
+                <img 
+                  src={it.url} 
+                  alt={it.caption || `Фото ${idx+1}`}
+                  onError={(e) => {
+                    console.error('Ошибка загрузки изображения:', it.url)
+                    e.target.style.display = 'none'
+                    e.target.nextSibling?.style.display = 'block'
+                  }}
+                  onLoad={() => {
+                    console.log('Изображение загружено:', it.url)
+                  }}
+                />
+                <div style={{display: 'none', padding: '20px', textAlign: 'center', color: '#666'}}>
+                  Ошибка загрузки изображения
+                </div>
                 {isAuthenticated && (
                   <button className="gallery-remove" onClick={() => onRemove(idx)} title="Удалить">×</button>
                 )}

@@ -1,7 +1,9 @@
 import './Products.css'
+import '../styles/services.css'
 import Reveal from '../components/Reveal'
 import Editable from '../components/Editable'
 import EditableGallery from '../components/EditableGallery'
+import ImageDebug from '../components/ImageDebug'
 import { useSEO } from '../hooks/useSEO'
 import StructuredData, { BreadcrumbData } from '../components/StructuredData'
 
@@ -42,6 +44,11 @@ export default function Products() {
 
         <Reveal y={22}>
           <EditableGallery pageKey="products" />
+        </Reveal>
+
+        {/* Временный компонент для отладки */}
+        <Reveal y={22}>
+          <ImageDebug pageKey="products" />
         </Reveal>
 
         <Reveal className="cta card" y={22}>
