@@ -198,4 +198,4 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'mmeliho@yandex.ru'  # email для отправки
 EMAIL_HOST_PASSWORD = 'srypbqkfmjdwvewg'  # пароль приложения (не основной пароль!)
 DEFAULT_FROM_EMAIL = 'АФК Урал <mmeliho@yandex.ru>'
-ADMIN_EMAIL = 'ammelihov@gmail.com'  # email для получения заявок
+ADMIN_EMAIL = 'office@afkural.ru'  # email для получения заявок
