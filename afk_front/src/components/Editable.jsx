@@ -17,9 +17,9 @@ export default function Editable({ pageKey, blockKey, contentType = 'text', tag 
     const fetchBlock = async () => {
       try {
         setLoading(true)
-        const resp = await axios.get(`/content-blocks/?page_key=${encodeURIComponent(pageKey)}`)
+        const resp = await axios.get(`/content-blocks/?page_key=${encodeURIComponent(pageKey)}&page_size=999`)
         const list = Array.isArray(resp.data) ? resp.data : (resp.data?.results || [])
-        const found = list.find(b => b.block_key === blockKey)
+        const found = list.find(b => b.block_key.toLowerCase() === blockKey.toLowerCase())
         if (found) {
           setBlockId(found.id)
           setValue(found.content || '')
@@ -67,8 +67,11 @@ export default function Editable({ pageKey, blockKey, contentType = 'text', tag 
 
   const onBlur = async () => {
     if (!isAuthenticated) return
-    const next = editorRef.current?.innerText ?? ''
-    if (next !== value) {
+    const next = contentType === 'html'
+      ? editorRef.current?.innerHTML ?? ''
+      : editorRef.current?.innerText ?? ''
+    const normalize = (str) => str?.trim().replace(/\s+/g, ' ') ?? ''
+    if (normalize(next) !== normalize(value)) {
       setValue(next)
       await save(next)
     }
